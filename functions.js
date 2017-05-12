@@ -7,6 +7,8 @@ let rowCount = 0;
 function findZombies(matrix) {
   colCount = matrix[0].length;
   rowCount = matrix.length;
+  knownInfections = [];
+  infectionsMatrix = [];
   let virus = matrix[0][0];
   let newInfections = [];
   let infection = {};
@@ -19,12 +21,9 @@ function findZombies(matrix) {
 
   while (newInfections.length > 0) {
     thisInfection = newInfections.shift();
-    if (!thisInfectionKnown(thisInfection)) {
+    if (!thisInfectionKnown(thisInfection.row, thisInfection.col)) {
       if (thisInfection.row > 0 && matrix[thisInfection.row - 1][thisInfection.col] === virus) {
-        if (!thisInfectionKnown({
-            row: thisInfection.row - 1,
-            col: thisInfection.col
-          })) {
+        if (!thisInfectionKnown(thisInfection.row - 1, thisInfection.col)) {
           newInfections.push({
             row: thisInfection.row - 1,
             col: thisInfection.col
@@ -32,10 +31,7 @@ function findZombies(matrix) {
         }
       }
       if (thisInfection.row < rowCount - 1 && matrix[thisInfection.row + 1][thisInfection.col] === virus) {
-        if (!thisInfectionKnown({
-            row: thisInfection.row + 1,
-            col: thisInfection.col
-          })) {
+        if (!thisInfectionKnown(thisInfection.row + 1, thisInfection.col)) {
           newInfections.push({
             row: thisInfection.row + 1,
             col: thisInfection.col
@@ -43,10 +39,7 @@ function findZombies(matrix) {
         }
       }
       if (thisInfection.col > 0 && matrix[thisInfection.row][thisInfection.col - 1] === virus) {
-        if (!thisInfectionKnown({
-            row: thisInfection.row,
-            col: thisInfection.col - 1
-          })) {
+        if (!thisInfectionKnown(thisInfection.row, thisInfection.col - 1)) {
           newInfections.push({
             row: thisInfection.row,
             col: thisInfection.col - 1
@@ -54,10 +47,7 @@ function findZombies(matrix) {
         }
       }
       if (thisInfection.row < colCount - 1 && matrix[thisInfection.row][thisInfection.col + 1] === virus) {
-        if (!thisInfectionKnown({
-            row: thisInfection.row,
-            col: thisInfection.col + 1
-          })) {
+        if (!thisInfectionKnown(thisInfection.row, thisInfection.col + 1)) {
           newInfections.push({
             row: thisInfection.row,
             col: thisInfection.col + 1
@@ -71,10 +61,10 @@ function findZombies(matrix) {
   return infectionsMatrix;
 }
 
-thisInfectionKnown = (potentialInfection) => {
+thisInfectionKnown = (row, col) => {
   let infectionKnown = false;
-  for (var i = 0; i < knownInfections.length; i++) {
-    infectionKnown = knownInfections[i].row === potentialInfection.row && knownInfections[i].col === potentialInfection.col ? true : false;
+  for (var i = 0; i < knownInfections.length && infectionKnown === false; i++) {
+    infectionKnown = knownInfections[i].row === row && knownInfections[i].col === col ? true : false;
   }
   return infectionKnown;
 };
@@ -95,7 +85,7 @@ loadInfectionsMatrix = () => {
 var exampleMatrix = [
   [8, 2, 3],
   [8, 8, 3],
-  [1, 8, 8]
+  [8, 8, 3]
 ];
 
 var exampleResult = [
@@ -105,3 +95,154 @@ var exampleResult = [
 ];
 
 console.log(findZombies(exampleMatrix));
+
+
+ Test Zombie maps
+var a = [
+[1, 0, 0, 0, 0, 0, 0, 1],
+[1, 1, 1, 0, 0, 0, 1, 1],
+[1, 0, 1, 0, 0, 1, 0, 1],
+[0, 1, 1, 1, 0, 1, 0, 1],
+[0, 0, 0, 1, 1, 1, 0, 1],
+[1, 0, 1, 0, 0, 1, 1, 1],
+[1, 1, 1, 1, 1, 1, 0, 1],
+[1, 1, 0, 0, 0, 1, 0, 1]];
+var b = [
+[1, 1, 0, 0, 0, 0, 0, 0],
+[0, 1, 0, 0, 0, 0, 0, 0],
+[0, 1, 1, 1, 1, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0]];
+Completed in 3ms
+ should show zombies in 8x8 matrix. zombie is number 2
+var Expected = [
+[1, 1, 1, 1, 1, 1, 1, 1],
+[1, 1, 0, 0, 0, 0, 0, 1],
+[1, 1, 1, 1, 1, 0, 0, 1],
+[1, 0, 0, 0, 0, 0, 0, 1],
+[1, 1, 0, 0, 0, 0, 0, 1],
+[1, 1, 0, 0, 0, 0, 0, 1],
+[1, 0, 0, 0, 0, 0, 0, 1],
+[1, 1, 1, 1, 1, 1, 1, 1]];
+var instead = [
+[1, 1, 0, 0, 0, 0, 0, 0],
+[0, 1, 0, 0, 0, 0, 0, 0],
+[0, 1, 1, 1, 1, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0]];
+
+var cExpected = [
+[1, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0]];
+var cinstead = [
+[1, 1, 0, 0, 0, 0, 0, 0],
+[0, 1, 0, 0, 0, 0, 0, 0],
+[0, 1, 1, 1, 1, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0]];
+
+var bExpected = [
+[1, 0, 0],
+[1, 1, 1],
+[1, 0, 1],
+[0, 0, 1]];
+var binstead = [
+[1, 1, 0, 0, 0, 0, 0, 0],
+[0, 1, 0, 0, 0, 0, 0, 0],
+[0, 1, 1, 1, 1, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0],
+[0, 0, 0],
+[0, 0, 0],
+[0, 0, 0]];
